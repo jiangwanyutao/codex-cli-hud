@@ -1,0 +1,12 @@
+{
+  "name": "quota-hud",
+  "version": "1.2.0",
+  "description": "Codex CLI HUD: subscription quotas, workspace, context and live session activity.",
+  "license": "MIT",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Codex CLI HUD",
+    "shortDescription": "Quotas, context, workspace and tools in a native footer.",
+    "category": "Productivity"
+  }
+}

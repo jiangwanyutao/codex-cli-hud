@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "codex-quota-hud": {
+      "command": "node",
+      "args": [
+        "scripts/quota-hud.js"
+      ],
+      "cwd": ".",
+      "startup_timeout_sec": 15
+    }
+  }
+}

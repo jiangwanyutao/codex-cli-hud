@@ -160,5 +160,12 @@ class SettingsTests(unittest.TestCase):
         self.override([{"baseUrl": "https://example.test/v1", "usageBaseUrl": "http://127.0.0.1:8765"}])
         self.assertEqual(self.read()["baseUrl"], "http://127.0.0.1:8765")
 
+    def test_http_active_gateway_preserves_scheme_port_and_path(self):
+        self.live("http://relay.example:8080/prefix/v1")
+        result = self.read()
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["templateType"], "auto")
+        self.assertEqual(result["baseUrl"], "http://relay.example:8080/prefix/v1")
+
 if __name__ == "__main__":
     unittest.main()

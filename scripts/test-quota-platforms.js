@@ -22,6 +22,39 @@ function server(routes) {
 }
 const configured = { baseUrl: "https://gateway.example/v1", apiKey: "synthetic-key", name: "My gateway" };
 
+test("real HTTP gateways preserve ports and prefixes during automatic quota detection", async () => {
+  const http = require("node:http");
+  for (const kind of ["newapi", "sub2api", "general"]) {
+    const calls = [];
+    const routes = kind === "newapi"
+      ? { "/api/status": { data: { system_name: "New API", quota_per_unit: 500000 } },
+          "/api/usage/token": { data: { object: "token_usage", total_available: 5000000, total_used: 1000000 } } }
+      : kind === "sub2api" ? { "/v1/usage": { balance: 10 } }
+      : { "/user/balance": { balance: 10 } };
+    const gateway = http.createServer((req, res) => {
+      calls.push({ path: req.url, authorization: req.headers.authorization });
+      const body = req.url.startsWith("/relay/") ? routes[req.url.slice(6)] : undefined;
+      res.writeHead(body ? 200 : 404, { "Content-Type": "application/json" });
+      res.end(JSON.stringify(body || {}));
+    });
+    await new Promise(resolve => gateway.listen(0, "127.0.0.1", resolve));
+    try {
+      const result = await collectPlatform({ ...configured,
+        baseUrl: `http://127.0.0.1:${gateway.address().port}/relay/v1` });
+      assert.equal(result.status, "ok", kind);
+      assert.equal(result.kind, kind);
+      assert.equal(result.remaining ?? result.balance, 10);
+      assert.ok(calls.every(call => call.path.startsWith("/relay/")));
+      assert.ok(calls.filter(call => call.path !== "/relay/api/status")
+        .every(call => call.authorization === "Bearer synthetic-key"));
+      assert.equal(calls[0].authorization, undefined);
+    } finally {
+      gateway.closeAllConnections();
+      await new Promise(resolve => gateway.close(resolve));
+    }
+  }
+});
+
 test("numeric parsing retains signed balances and rejects coercions", () => {
   for (const value of [null, undefined, "", " ", true, false, [], {}, "0x10", "Infinity", NaN, Infinity]) assert.equal(number(value), undefined);
   assert.equal(number("-0.000001"), -0.000001);

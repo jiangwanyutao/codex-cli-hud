@@ -22,6 +22,8 @@ Official mode uses the current Codex host's quota snapshot. Custom API mode quer
 
 ## Requirements
 
+Custom gateways support both **HTTP and HTTPS**. The current Codex base URL (for example, `http://relay.example:8080/prefix/v1`) retains its scheme, port, and path prefix while detecting NewAPI, Sub2API, or general balance endpoints. No HTTP opt-in is needed. The gateway must expose a supported quota endpoint.
+
 - Node.js 22 or newer and Python 3.11 or newer, available as `node` and `python`.
 - Codex CLI with the experimental native statusline extension. Local integration was verified with **Codex CLI 0.171.0**; compatibility with other versions is not guaranteed.
 - A terminal running Codex CLI. This footer is not a Codex desktop App extension. Full-screen mode and at least 80 columns are recommended.

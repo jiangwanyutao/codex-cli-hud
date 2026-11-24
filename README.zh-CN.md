@@ -22,6 +22,8 @@ Claude HUD 风格的 Codex CLI 状态栏：在紧凑的终端底栏中显示当�
 
 ## 环境要求
 
+自定义中转站同时支持 **HTTP 和 HTTPS**。直接使用当前 Codex 配置中的地址（例如 `http://relay.example:8080/prefix/v1`），保留协议、端口和路径前缀，自动识别 NewAPI、Sub2API 或通用余额接口，无需单独开启 HTTP。中转站需要提供对应的额度查询接口。
+
 - Node.js 22+、Python 3.11+，终端可执行 `node` 和 `python`。
 - 支持实验性原生状态栏扩展的 Codex CLI。本地已在 **Codex CLI 0.171.0** 验证，其他版本兼容性未经保证。
 - 在终端运行 Codex CLI；这不是 Codex 桌面 App 扩展。建议全屏模式、至少 80 列。

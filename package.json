@@ -1,0 +1,27 @@
+{
+  "name": "codex-cli-hud",
+  "version": "1.2.0",
+  "description": "Claude HUD-style native Codex CLI statusline with provider quotas and session activity.",
+  "license": "MIT",
+  "type": "commonjs",
+  "author": "jiangwanyutao",
+  "engines": {
+    "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jiangwanyutao/codex-cli-hud.git"
+  },
+  "keywords": [
+    "codex",
+    "hud",
+    "statusline",
+    "quota"
+  ],
+  "scripts": {
+    "build": "node scripts/build-quota-plugin.js",
+    "check": "node scripts/test-all.js --check",
+    "test": "node scripts/test-all.js",
+    "test:sandbox": "node scripts/test-quota-custom.js --sandbox"
+  }
+}

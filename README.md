@@ -8,6 +8,8 @@ A Claude HUD-style statusline for Codex CLI: current provider quota, context usa
 
 *Illustrative preview with synthetic values; actual values come from your current session.*
 
+The native footer uses three rows: model and directory; quota beside context usage; run state and tool activity. Long content rotates through pages while context stays visible.
+
 ## What it shows
 
 - Model and working directory. Long paths are truncated to fit the terminal.

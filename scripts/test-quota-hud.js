@@ -37,7 +37,7 @@ async function testDescriptorsAndDetachedCollection() {
   const state={thread:{model:{display_name:"Model-A"},workspace:{cwd:"project-A"},usage:{context:{used_percentage:12}}},account:{rate_limits:[{limit_id:"codex",primary_limit:{used_percent:90,window_minutes:300}}]}};
   const start=performance.now();const first=read(provider,state);
   assert.ok(performance.now()-start<1000);assert.match(first,/Model-A/);assert.match(first,/12%/);assert.doesNotMatch(first,/OpenAI/);
-  assert.equal(first.split("\n")[1], "\u67e5\u8be2\u4e2d");
+  assert.match(first.split("\n")[1], /^查询中.*上下文.*12%$/);
   await Promise.resolve();assert.equal(calls,1);
   await new Promise(r=>setTimeout(r,1100));read(provider,state);assert.equal(calls,1);
   pending.resolve({status:"ok",kind:"sub2api",name:"Current API",remaining:42,unit:"USD"});

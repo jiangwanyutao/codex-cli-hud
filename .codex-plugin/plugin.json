@@ -1,6 +1,6 @@
 {
   "name": "quota-hud",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Codex CLI HUD: subscription quotas, workspace, context and live session activity.",
   "license": "MIT",
   "mcpServers": "./.mcp.json",

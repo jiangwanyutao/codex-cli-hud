@@ -92,7 +92,7 @@ function createProvider(options = {}) {
   }
   function respond(method, params = {}) {
     switch (method) {
-      case "initialize": return { protocolVersion: "2025-06-18", capabilities: { tools: {}, resources: {} }, serverInfo: { name: "codex-quota-hud", version: "1.2.0" } };
+      case "initialize": return { protocolVersion: "2025-06-18", capabilities: { tools: {}, resources: {} }, serverInfo: { name: "codex-quota-hud", version: "1.2.1" } };
       case "ping": return {};
       case "tools/list": return { tools: [TOOL] };
       case "tools/call":

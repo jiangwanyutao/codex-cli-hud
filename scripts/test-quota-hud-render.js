@@ -19,7 +19,8 @@ assert.equal(rows.length, 3);
 assert.match(rows[0], /\[gpt-5.4\].*quota-hud.*分支:\(main\*\)/);
 assert.match(rows[1], /^已用.*78%.*剩余 \$395\.9154 \/ \$1,800\.00/);
 assert.doesNotMatch(plain, /公司订阅/);
-assert.match(rows[2], /^上下文 .*45%$/);
+assert.match(rows[1], /上下文 .*45%$/);
+assert.equal(rows[2], "");
 assert.doesNotMatch(plain, /OpenAI|官方|sub2api|Sub2API|remaining|Usage|Context|unavailable|loading/);
 assert.ok(rows.every(row => cellWidth(row) <= 76));
 assert.equal(flatten(renderTree(fixture, { now })), plain);
@@ -34,13 +35,14 @@ const officialFixture = { ...fixture, provider: { status: "official" }, official
 const officialRows = render(officialFixture, { now, native: true }).split("\n");
 assert.equal(officialRows.length, 3);
 assert.match(officialRows[1], /^官方.*5小时.*25%.*每周.*91%/);
-assert.match(officialRows[2], /^上下文/);
+assert.match(officialRows[1], /上下文/);
 assert.doesNotMatch(officialRows[2], /官方|OpenAI/);
 assert.doesNotMatch(officialRows.join("\n"), /当前服务|暂不可用|公司订阅/);
 assert.ok(officialRows.every(row => cellWidth(row) <= 76));
 const combinedRows = render({ ...fixture, official }, { now, native: true }).split("\n");
 assert.match(combinedRows[1], /^已用/);
-assert.match(combinedRows[2], /上下文.*官方/);
+assert.match(combinedRows[1], /上下文/);
+assert.match(combinedRows[2], /官方/);
 assert.ok(combinedRows.every(row => cellWidth(row) <= 76));
 const longTitle = render({ ...fixture, project: "很长的项目名称".repeat(30) }, { now, native: true }).split("\n");
 assert.match(longTitle[0], /…$/);
@@ -78,7 +80,7 @@ for (const remaining of [0, 42]) {
   for (const native of [true, false]) {
     const row = render(data, { now, native }).split("\n")[1];
     assert.match(row, new RegExp(`剩余 ${remaining} 次`));
-    assert.doesNotMatch(row, /暂无数据|\$|custom/);
+    assert.doesNotMatch(row.split(" │ ")[0], /暂无数据|\$|custom/);
   }
 }
 const rotatingFixture = { ...fixture, provider: { ...fixture.provider, windows: [
@@ -114,7 +116,7 @@ const legacy = render({ cowork6: { balance: 12.3 } }, { now });
 assert.match(legacy, /余额 \$12\.30/);
 for (const native of [true, false]) {
   const loading = render({ provider: { status: "loading", name: "api.example.com" } }, { native, now });
-  assert.equal(loading.split("\n")[1], "查询中");
+  assert.match(loading.split("\n")[1], /^查询中/);
   assert.doesNotMatch(loading, /api\.example\.com/);
   const ready = render({ ...fixture, provider: { ...fixture.provider, name: "api.example.com" } }, { native, now });
   assert.doesNotMatch(ready, /api\.example\.com/);
@@ -131,7 +133,8 @@ for (let tick = 0; tick < 20; tick++) {
   assert.equal(lines.length, 3);
   assert.match(lines[0], /D:\\project\\codex-quota-hud/);
   assert.match(lines[1], /^已用/);
-  assert.match(lines[2], /^上下文 .*45%/);
+  assert.match(lines[1], /上下文 .*45%/);
+  assert.doesNotMatch(lines[2], /上下文/);
   assert.ok(lines.every(line => cellWidth(line) <= 76));
   assert.doesNotMatch(output, /SECRET_ARGUMENT|公司订阅|sub2api/);
   activityPages.push(lines[2]);
@@ -165,3 +168,9 @@ assert.doesNotMatch(hostileActivity, /\x1b|\u202e|SECRET|badCount|子代理|任�
 assert.ok(hostileActivity.split("\n").every(line => cellWidth(line) <= 76));
 if (process.argv.includes("--preview")) console.log(render(activityFixture, { now, native: true }));
 console.log("quota HUD renderer: all checks passed");
+
+for (const width of [8, 20, 40, 60, 76]) {
+ const lines = render(activityFixture, {now, native:true, width}).split("\n");
+ assert.ok(lines.every(line => cellWidth(line) <= width));
+ if(width >= 20) assert.match(lines[1], /上下文/);
+}

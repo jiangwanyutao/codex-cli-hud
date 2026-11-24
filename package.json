@@ -1,6 +1,6 @@
 {
   "name": "codex-cli-hud",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Claude HUD-style native Codex CLI statusline with provider quotas and session activity.",
   "license": "MIT",
   "type": "commonjs",

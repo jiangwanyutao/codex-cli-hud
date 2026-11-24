@@ -15,7 +15,7 @@ json(".agents/plugins/marketplace.json", {
     policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" }, category: "Productivity" }],
 });
 json("plugins/quota-hud/.codex-plugin/plugin.json", {
-  name: "quota-hud", version: "1.2.0", description: "Codex CLI HUD: subscription quotas, workspace, context and live session activity.",
+  name: "quota-hud", version: "1.2.1", description: "Codex CLI HUD: subscription quotas, workspace, context and live session activity.",
   license: "MIT", mcpServers: "./.mcp.json",
   interface: { displayName: "Codex CLI HUD", shortDescription: "Quotas, context, workspace and tools in a native footer.", category: "Productivity" },
 });

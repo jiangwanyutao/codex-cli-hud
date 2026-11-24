@@ -250,20 +250,21 @@ function activitySegments(activity, runState) {
   return result;
 }
 
-function activityRow(context, segments, width, now) {
-  const prefix = `上下文 ${bar(context, 5)}`;
-  if (!segments.length) return fit(`上下文 ${bar(context, 10)}`, width);
-  const simple = [prefix, ...segments].join(" │ ");
+function activityRow(segments, width, now) {
+  if (!segments.length) return "";
+  const simple = segments.join(" │ ");
   if (cellWidth(simple) <= width) return simple;
-  const budget = Math.max(1, width - cellWidth(prefix) - 11);
+  const pinned = ["启动中", "就绪", "执行中", "等待中", "思考中"].includes(segments[0]) ? segments[0] + " │ " : "";
+  const remaining = pinned ? segments.slice(1) : segments;
+  const budget = Math.max(1, width - cellWidth(pinned) - 8);
   const pages = [];
-  for (const segment of segments) {
+  for (const segment of remaining) {
     const last = pages.at(-1);
     if (last && cellWidth(last + " · " + segment) <= budget) pages[pages.length - 1] += " · " + segment;
     else pages.push(fit(segment, budget));
   }
   const page = Math.floor(now / 5000) % pages.length;
-  return fit(`${prefix} │ [${page + 1}/${pages.length}] ${pages[page]}`, width);
+  return fit(`${pinned}[${page + 1}/${pages.length}] ${pages[page]}`, width);
 }
 
 function render(snapshot = {}, options = {}) {
@@ -305,11 +306,16 @@ function render(snapshot = {}, options = {}) {
   const officialOnly = cowork?.status === "official" || (!cowork && Boolean(official));
   const activity = activitySegments(snapshot.activity, snapshot.runState);
   const activityWithOfficial = [...activity, ...(officialOnly ? [] : officialSegments)];
-  const rows = options.native ? [fit(title, width),
-    officialOnly ? nativeUsageRow(undefined, official, officialState, now, width, false) :
-      nativeProviderRow(cowork, providerName, providerKind, coworkState, coworkSegments.length ? coworkSegments : rawWindows.length || coworkState ? [] : ["暂无数据"], rawWindows, unit, now, width),
-    activity.length ? activityRow(snapshot.contextPercent, activityWithOfficial, width, now) :
-      nativeUsageRow(snapshot.contextPercent, officialOnly ? undefined : official, officialState, now, width),
+  const contextLabel = `上下文 ${compactUsage(snapshot.contextPercent, width >= 60 ? 3 : 0)}`;
+  const quotaWidth = Math.max(1, width - cellWidth(contextLabel) - 3);
+  const compactSummary = coworkSegments.map(segment => segment.replace(/([█░]+) (\d+(?:\.\d+)?)%/g,
+    (_, glyphs, value) => bar(Number(value), 3)));
+  const quotaRow = officialOnly ? nativeUsageRow(undefined, official, officialState, now, quotaWidth, false) :
+    nativeProviderRow(cowork, providerName, providerKind, coworkState,
+      compactSummary.length ? compactSummary : rawWindows.length || coworkState ? [] : ["暂无数据"], rawWindows, unit, now, quotaWidth);
+  const usageRow = cellWidth(contextLabel) + 4 > width ? fit(contextLabel, width) : `${quotaRow} │ ${contextLabel}`;
+  const rows = options.native ? [fit(title, width), usageRow,
+    activityRow(activityWithOfficial, width, now),
   ] : [fit(title, width),
     ...layout(officialOnly ? officialSegments : [[coworkLabel, coworkSummary].filter(Boolean).join(" · "), ...coworkWindows], width),
     ...layout([`上下文 ${bar(snapshot.contextPercent, size)}`, ...activityWithOfficial], width)];
